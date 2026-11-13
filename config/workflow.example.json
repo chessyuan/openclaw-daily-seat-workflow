@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 2,
+  "name": "checkin",
+  "displayName": "签到",
+  "status": "confirmed",
+  "confirmed": true,
+  "engine": "visual-observe-act",
+  "app": "微信 / 我去图书馆",
+  "package": "com.tencent.mm",
+  "node": "my-android-phone",
+  "executionWindow": {
+    "start": "06:28",
+    "diagnoseAt": "06:35",
+    "end": "06:43",
+    "timezone": "Asia/Shanghai",
+    "retryUntilSuccess": true,
+    "opensAt": "06:30"
+  },
+  "stopOnSuccess": true,
+  "seatPolicy": {
+    "primary": "博学楼四楼半圆弧平7号",
+    "backup": "博学楼三楼半圆弧平7号",
+    "switchCondition": "主座位已被预订且明确不是本人预约，备用座位存在选座入口；归属不明先观察，不能直接切换",
+    "alreadyOwned": "本人已有预约时保留原预约，进入签到核验",
+    "otherSeatsAllowed": false
+  },
+  "completionRule": "微信预约提交记录持久化后立即调用WegoLibrary签到并复核；接口已接受则优先只读核实，禁止盲目重订；最终追加签到后才清后台、息屏并报告。",
+  "steps": [
+    {
+      "intent": "命令启动微信",
+      "action": {
+        "type": "launch",
+        "package": "com.tencent.mm"
+      },
+      "after": {
+        "package": "com.tencent.mm"
+      }
+    },
+    {
+      "intent": "进入我去图书馆会话",
+      "action": {
+        "type": "vision_activate",
+        "text": "我去图书馆"
+      },
+      "after": {
+        "visualTarget": "座位"
+      }
+    },
+    {
+      "intent": "打开座位页面",
+      "action": {
+        "type": "vision_activate",
+        "text": "座位"
+      },
+      "after": {
+        "visualTarget": "常用座位"
+      }
+    },
+    {
+      "intent": "优先四楼7号，主座位被占且不是本人预约才选择三楼7号；只点击对应卡片的选座文字",
+      "action": {
+        "type": "vision_activate",
+        "section": "常用座位",
+        "textContains": "博学楼四楼半圆弧平7号",
+        "fallbackTextContains": "博学楼三楼半圆弧平7号",
+        "selectionRule": "遵循seatPolicy条件，不允许无条件点击任意选座按钮"
+      },
+      "after": {
+        "visualState": "seat-selection-accepted-or-advertisement-page"
+      }
+    },
+    {
+      "intent": "预约与WegoLibrary签到均核实后执行最终追加签到，再清后台息屏；清理或日志失败不得重新预约",
+      "action": {
+        "type": "global_action",
+        "name": "recents",
+        "then": "clear_all"
+      },
+      "after": {
+        "visualState": "recent-apps-empty-and-screen-off"
+      }
+    }
+  ],
+  "safety": {
+    "noSecureLockBypass": true,
+    "noStoredPin": true,
+    "coordinates": "fresh-screenshot-normalized-only",
+    "retry": "bounded"
+  }
+}

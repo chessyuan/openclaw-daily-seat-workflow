@@ -1,0 +1,10 @@
+[Unit]
+Description=Retry explicitly rejected Android workflow notifications with fresh WeChat context
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 %h/.local/bin/android-notification-outbox.py
+TimeoutStartSec=120
+Nice=10
+UMask=0077

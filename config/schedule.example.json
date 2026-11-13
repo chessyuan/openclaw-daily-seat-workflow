@@ -1,0 +1,31 @@
+{
+  "name": "android-checkin-0628-window",
+  "enabled": false,
+  "schedule": {
+    "kind": "cron",
+    "expr": "28 6 * * *",
+    "tz": "Asia/Shanghai",
+    "staggerMs": 0
+  },
+  "payload": {
+    "kind": "command",
+    "argv": [
+      "<home>/.local/bin/android-signin",
+      "--not-before",
+      "06:30",
+      "--until",
+      "06:43",
+      "--settle-until",
+      "06:50",
+      "--diagnose-at",
+      "06:35",
+      "--finish-phone"
+    ]
+  },
+  "delivery": {
+    "mode": "announce",
+    "channel": "openclaw-weixin",
+    "to": "<recipient>",
+    "accountId": "<account>"
+  }
+}
